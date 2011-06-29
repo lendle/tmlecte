@@ -1,11 +1,11 @@
 logit <- function(x) qlogis(x)
 logistic <- function(x) plogis(x)
 
-print.nde <- function(x, ...) {
-  cat("NDE:", x$psi,
-      "\nEstimated Variance:", x$var.psi,
-      "\n95% Confidence interval: (", x$CI[1], ",", x$CI[2],")",
-      "\nP-value for H0: psi=0 vs. H1: psi!=0:", format.pval(x$pvalue, eps=0.001), "\n")
+print.cte <- function(x, ...) {
+  cat(estimand, ": ", x$psi,
+      "\nEstimated Variance: ", x$var.psi,
+      "\n95% Confidence interval: (", x$CI[1], ", ", x$CI[2],")",
+      "\nP-value for H0: psi=0 vs. H1: psi!=0:", format.pval(x$pvalue, eps=0.001), "\n", sep="")
 }
 
 ##' Estimates the ``conditional treatment effect'' E(E(Y|A=1,W)-E(Y|A=0,W)|A=a) using Targetted Maximum Likelihood.
@@ -158,13 +158,53 @@ tmle.cte <- function(A, B, Y, a=0, Q.SL.library, g.SL.library, family=gaussian()
     p.Aa <- mean(Aa)
     IC <- ((A*g.Aa/g.A1 - (1-A)*g.Aa/g.A0)*(Y-Q.AA)+Aa*(Q.A1-Q.A0 - psi))/p.Aa
     if (verbose) {
-      cat("Mean of the influence curve:", mean(IC) "\n")
+      cat("Mean of the influence curve:", mean(IC), "\n")
     }
     var.psi <- var(IC)/length(Y)
     CI <- psi + c(-1.96, 1.96)*sqrt(var.psi)
     pvalue <- 2*(1-pnorm(abs(psi/sqrt(var.psi))))
-    res <- list(psi=psi, var.psi=var.psi, CI=CI, pvalue=pvalue, IC=IC)
+    estimand <- paste("E(E(Y|A=1,B)-E(Y|A=0,B)|A=", a, ")", sep="")
+    res <- list(psi=psi, var.psi=var.psi, CI=CI, pvalue=pvalue, IC=IC, estimand=estimand)
   }
-  class(res) <- c("tmle.nde", "nde")
+  class(res) <- c("cte")
   res
+}
+
+
+regress <- function(Y, X, family=binomial(), method="glm", ...) {
+  SL.version <- packageVersion("SuperLearner")$major
+  if (method=="glm" || !require(SuperLearner)) {
+    if (method=="SL") warning("SuperLearner could not be loaded, using main terms glm", call.=FALSE)
+    fit <- glm.fit(X, Y, family=family)
+  } else if (method=="SL") {
+    if (SL.version==1) {
+      fit <- SuperLearner(Y, data.frame(X), family=family, ...)
+    }
+    else {
+      stop("regress hasn't been written for new SL")
+    }
+  }
+  res <- list(fit=fit, method=method, SL.version=SL.version)
+  class(res) <- "regress"
+  return(res)
+}
+
+predict.regress <- function(object, newdata=NULL, ...) {
+  if (object$method=="glm") {
+    pred <- predict.glm(object$fit, newdata=newdata, type=response)
+  }
+  else if (object$method=="SL") {
+    if (object$SL.version==1) {
+      if (is.null(newdata)) {
+        pred <- predict(object$fit)$fit
+      } else {
+        pred <-  predict(object$fit, newdata=newdata)
+      }
+    }
+    else {
+      warning("This code (predict for new SL) has not been tested")
+      pred <- predict(object$fit, newdata=newdata)
+    }
+  }
+  return(pred)
 }
