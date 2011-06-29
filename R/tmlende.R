@@ -37,6 +37,7 @@ print.cte <- function(x, ...) {
 ##' SuperLearner calls
 ##' @return adsf
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
+##' @export
 tmle.cte <- function(A, B, Y, a=0, Q.SL.library, g.SL.library, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
   Aa <- as.numeric(A==a)
