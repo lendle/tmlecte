@@ -1,2 +1,4 @@
 export(gendata)
 export(tmle.cte)
+export(regress)
+export(predict.regress)
