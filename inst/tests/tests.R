@@ -17,7 +17,7 @@ test_that("regress and predict.regress", {
   expect_that(pr2 <- predict(r2), is_a("numeric"))
   expect_that(all(pr2 >= 0 & pr2 <=1), is_true())
   if (!("SuperLearner" %in% installed.packages()[,1L])) {
-    expect_that(rnsl <- regress(Y, X, method="SL", SL.library="glm"), gives_warning("SuperLearner is not installed"))
+    expect_that(rnsl <- regress(Y, X, family=gaussian, method="SL", SL.library="SL.glm"), gives_warning("SuperLearner is not installed"))
     expect_that(rnsl$method, equals("glm"))
   } else {
     SL.version <- packageVersion("SuperLearner")$major
@@ -27,3 +27,8 @@ test_that("regress and predict.regress", {
     expect_that(predict(rsl), is_a("matrix"))
   }
 })
+
+
+dat <- gendata(100)
+
+t <- tmle.cte(dat$A, dat[,c("W1","W2", "W3")], dat$Y, a=1, family=binomial, Q.method="SL")

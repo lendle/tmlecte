@@ -1,4 +1,4 @@
-Package: tmlende
+Package: tmlecte
 Maintainer: Sam Lendle <lendle@stat.berkeley.edu>
 License: GPL-3
 Title: Estimates the NDE and ATT with TMLE
@@ -18,4 +18,5 @@ Description: Estimates the Average Treatment effect among the Treated
     made available in the tmle package on CRAN in the future.
 Version: 0.1-1
 Date: 2011-05-28
-Collate: 'tmlende.R'
+Suggests: SuperLearner
+Collate: 'helpers.r' 'tmlecte-package.R' 'tmlecte.R'
