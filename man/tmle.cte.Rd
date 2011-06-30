@@ -1,9 +1,11 @@
 \name{tmle.cte}
 \alias{tmle.cte}
 \title{tmle.cte function}
-\usage{tmle.cte(A, B, Y, a=0, Q.SL.library, g.SL.library, family=gaussian(),
-    tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10,
-    1 - 1e-10), gbound=c(1e-10, 1 - 1e-10), ...)}
+\usage{tmle.cte(A, B, Y, a=0, Q.method="glm", Q.formula, Q.SL.library,
+    g.method="glm", g.formula, g.SL.library=c("SL.glm", "SL.step",
+    "SL.knn"), family=gaussian(), tol=1e-10, maxiter=100, target=TRUE,
+    verbose=FALSE, Qbound=c(1e-10, 1 - 1e-10), gbound=c(1e-10, 1 -
+    1e-10), ...)}
 \description{Estimates the ``conditional treatment effect'' E(E(Y|A=1,W)-E(Y|A=0,W)|A=a) using Targetted Maximum Likelihood.}
 \details{<details>}
 \value{adsf}
