@@ -2,7 +2,7 @@ logit <- function(x) qlogis(x)
 logistic <- function(x) plogis(x)
 
 print.cte <- function(x, ...) {
-  cat(estimand, ": ", x$psi,
+  cat(x$estimand, ": ", x$psi,
       "\nEstimated Variance: ", x$var.psi,
       "\n95% Confidence interval: (", x$CI[1], ", ", x$CI[2],")",
       "\nP-value for H0: psi=0 vs. H1: psi!=0:", format.pval(x$pvalue, eps=0.001), "\n", sep="")
@@ -38,22 +38,51 @@ print.cte <- function(x, ...) {
 ##' @return adsf
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @export
-tmle.cte <- function(A, B, Y, a=0, Q.SL.library, g.SL.library, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
+tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
+  if (is.character(family)) 
+    family <- get(family, mode = "function", envir = parent.frame())
+  if (is.function(family)) 
+    family <- family()
+  if (is.null(family$family)) {
+    print(family)
+    stop("'family' not recognized")
+  }
+  if (!(family$family %in% c("gaussian", "binomial"))) {
+    stop("Currently only gaussian and binomial families are supported")
+  }
+
+  if (is.null(Q.SL.library)) {
+    if (family$family=="guassian") {
+      Q.SL.library <- c("SL.glm", "SL.step")
+    } else {
+      Q.SL.library <- c("SL.glm", "SL.step", "SL.knn")
+    }
+  }
+
+    
   Aa <- as.numeric(A==a)
 
-  Q.init.fit <- SuperLearner(Y, data.frame(A, B), SL.library=Q.SL.library, family=family, ...)
-  
+  #Q.init.fit <- SuperLearner(Y, data.frame(A, B), SL.library=Q.SL.library, family=family, ...)
+  Q.init.fit <- regress(Y, data.frame(A=A, B), family=family,
+                        method=Q.method,
+                        formula=Q.formula,
+                        SL.library=Q.SL.library,
+                        ...)
   #Q.init.fit <- glm(Qform, gaussian, dat, subset=(Delta==1))
   #Change to SL fit if you want, but remember that gform only has one variable so some
   #algorithms won't work
-  Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B))$fit
-  Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B))$fit
+  Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B))
+  Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B))
   
   
   
-  g.init.fit <- SuperLearner(A, B, SL.library=g.SL.library, family=binomial,...)
-  g.A1 <- .bound(predict(g.init.fit, newdata=B)$fit, gbound)
+  #g.init.fit <- SuperLearner(A, B, SL.library=g.SL.library, family=binomial,...)
+  g.init.fit <- regress(A, B, family=binomial,
+                        method=g.method,
+                        SL.library=g.SL.library,
+                        ...)
+  g.A1 <- .bound(predict(g.init.fit, newdata=B), gbound)
   g.A0 <- 1-g.A1
   g.Aa <- a*g.A1 + (1-a)*g.A0
 
@@ -171,18 +200,38 @@ tmle.cte <- function(A, B, Y, a=0, Q.SL.library, g.SL.library, family=gaussian()
   res
 }
 
-
-regress <- function(Y, X, family=binomial(), method="glm", ...) {
-  SL.version <- packageVersion("SuperLearner")$major
-  if (method=="glm" || !require(SuperLearner)) {
-    if (method=="SL") warning("SuperLearner could not be loaded, using main terms glm", call.=FALSE)
-    fit <- glm.fit(X, Y, family=family)
+##' <description>
+##'
+##' <details>
+##' @title <title>
+##' @param Y 
+##' @param X 
+##' @param family 
+##' @param method 
+##' @param formula 
+##' @param ... 
+##' @return <return>
+##' @author Sam Lendle
+##' @export
+regress <- function(Y, X, family=binomial(), method="glm", formula=Y~., ...) {
+  SL.installed <- "SuperLearner" %in% installed.packages()[,1]
+  SL.version <- NULL
+  if (method=="glm" || !SL.installed) {
+    if (method=="SL") {
+      warning("SuperLearner is not installed, using main terms glm", call.=FALSE)
+      method <- "glm"
+    }
+    if (is.null(formula)) formula <- Y~.
+    fit <- glm(formula, data=data.frame(Y, X), family=family)
   } else if (method=="SL") {
+    require(SuperLearner)
+    SL.version <- packageVersion("SuperLearner")$major
     if (SL.version==1) {
+      warning("Your version of SuperLearner is out of date. You should consider updating to version 2 if you don't have a good reason not to...")
       fit <- SuperLearner(Y, data.frame(X), family=family, ...)
     }
     else {
-      stop("regress hasn't been written for new SL")
+      fit <- SuperLearner(Y, data.frame(X), family=family, ...)
     }
   }
   res <- list(fit=fit, method=method, SL.version=SL.version)
@@ -190,19 +239,28 @@ regress <- function(Y, X, family=binomial(), method="glm", ...) {
   return(res)
 }
 
+##' <description>
+##'
+##' <details>
+##' @title <title>
+##' @param object 
+##' @param newdata 
+##' @param ... 
+##' @return <return>
+##' @author Sam Lendle
+##' @export
 predict.regress <- function(object, newdata=NULL, ...) {
   if (object$method=="glm") {
-    pred <- predict.glm(object$fit, newdata=newdata, type=response)
+    pred <- predict.glm(object$fit, newdata=newdata, type="response")
   }
   else if (object$method=="SL") {
     if (object$SL.version==1) {
       if (is.null(newdata)) {
-        pred <- predict(object$fit)$fit
+        pred <- predict(object$fit)
       } else {
-        pred <-  predict(object$fit, newdata=newdata)
+        pred <-  predict(object$fit, newdata=data.frame(newdata))$fit
       }
-    }
-    else {
+    } else {
       warning("This code (predict for new SL) has not been tested")
       pred <- predict(object$fit, newdata=newdata)
     }
