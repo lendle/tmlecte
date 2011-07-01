@@ -28,16 +28,3 @@ test_that("regress and predict.regress", {
   }
 })
 
-library(devtools)
-library(tmlecte)
-dev_mode(TRUE, "~/R-dev-SL1")
-#load_all("tmlecte")
-dat <- gendata(100)
-
-t <- tmle.cte(dat$A, dat[,c("W1","W2", "W3")], dat$Y, a=1, family=binomial, Q.method="SL")
-Y <- dat$Y
-A=dat$A
-B <- data.frame(dat[, c("W1", "W2", "W3")])
-
-r <- regress(Y, data.frame(A=A, B=B), family=binomial, method="SL", SL.library="SL.glm")
-
