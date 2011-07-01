@@ -72,9 +72,9 @@ tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=
   #Q.init.fit <- glm(Qform, gaussian, dat, subset=(Delta==1))
   #Change to SL fit if you want, but remember that gform only has one variable so some
   #algorithms won't work
-  Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B))
-  Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B))
-  
+  Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B), X=data.frame(A=A, B), Y=Y)
+  Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B), X=data.frame(A=A, B), Y=Y)
+
   
   
   #g.init.fit <- SuperLearner(A, B, SL.library=g.SL.library, family=binomial,...)
@@ -82,7 +82,7 @@ tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=
                         method=g.method,
                         SL.library=g.SL.library,
                         ...)
-  g.A1 <- .bound(predict(g.init.fit, newdata=B), gbound)
+  g.A1 <- .bound(predict(g.init.fit), gbound)
   g.A0 <- 1-g.A1
   g.Aa <- a*g.A1 + (1-a)*g.A0
 
@@ -249,20 +249,21 @@ regress <- function(Y, X, family=binomial(), method="glm", formula=Y~., ...) {
 ##' @return <return>
 ##' @author Sam Lendle
 ##' @export
-predict.regress <- function(object, newdata=NULL, ...) {
+predict.regress <- function(object, newdata=NULL, X=NULL, Y=NULL, ...) {
   if (object$method=="glm") {
     pred <- predict.glm(object$fit, newdata=newdata, type="response")
   }
   else if (object$method=="SL") {
+    if (any(is.null(Y), is.null(X)) & !is.null(newdata)) warning("Original data needs to be passed to predict.regress when using SuperLearner and newdata.  predict may fail depending on the SL.library otherwise...")
     if (object$SL.version==1) {
       if (is.null(newdata)) {
         pred <- predict(object$fit)
       } else {
-        pred <-  predict(object$fit, newdata=data.frame(newdata))$fit
+        pred <-  predict(object$fit, newdata=data.frame(newdata), X=X, Y=Y)$fit
       }
     } else {
-      warning("This code (predict for new SL) has not been tested")
-      pred <- predict(object$fit, newdata=newdata)
+      warning("This code (predict for new SL) has not been tested much")
+      pred <- predict(object$fit, newdata=newdata, X=X, Y=Y)
     }
   }
   return(pred)
