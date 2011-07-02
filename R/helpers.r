@@ -16,6 +16,7 @@
 ##' @return <return>
 ##' @author Susan Gruber
 ##' @name setColnames
+##' @aliases .setColnames
 .setColnames <- function(x.colnames, x.ncols, firstChar){
 	if(is.null(x.colnames)) {
 		if(x.ncols > 1){
@@ -39,7 +40,8 @@
 ##' @param bounds object of numeric data where the min is the minimum bound and the max is the maximum bound
 ##' @return x with values less than \code{min(bounds)} set to \code{min(bounds)}, likewise for values greater than \code{max(bounds)}
 ##' @author Susan Gruber
-##' @name bound
+##' @name bounds
+##' @aliases .bounds
 .bound <- function(x, bounds){
 	x[x>max(bounds)] <- max(bounds)
 	x[x<min(bounds)] <- min(bounds)

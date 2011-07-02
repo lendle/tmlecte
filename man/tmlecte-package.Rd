@@ -20,7 +20,6 @@ the NDE can be efficiently estimated were both Z and W have large dimensions. Th
 is a working package.  The methods in this package will likely be made available in
 the tmle package on CRAN in the future.}
 \alias{tmlecte}
-\docType{package}
 \author{Sam Lendle \email{lendle@stat.berkeley.edu}}
 \references{<ref>}
 \keyword{package}

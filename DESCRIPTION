@@ -16,7 +16,7 @@ Description: Estimates the Average Treatment effect among the Treated
     efficiently estimated were both Z and W have large dimensions. This
     is a working package.  The methods in this package will likely be
     made available in the tmle package on CRAN in the future.
+Enhances: SuperLearner
 Version: 0.1-1
 Date: 2011-05-28
-Suggests: SuperLearner
 Collate: 'helpers.r' 'regress.R' 'tmlecte-package.R' 'tmlecte.R'
