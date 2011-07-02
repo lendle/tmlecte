@@ -47,22 +47,22 @@ regress <- function(Y, X, family=binomial(), method="glm", formula=Y~., ...) {
 ##' @return <return>
 ##' @author Sam Lendle
 ##' @export
-predict.regress <- function(object, newdata=NULL, X=NULL, Y=NULL, ...) {
+predict.regress <- function(object, newdata, X=NULL, Y=NULL, ...) {
   if (object$method=="glm") {
-    pred <- predict.glm(object$fit, newdata=newdata, type="response")
+    if (missing(newdata)) return(predict(object$fit, type="response"))
+    return(predict(object$fit, newdata=newdata, type="response"))
   }
   else if (object$method=="SL") {
-    if (any(is.null(Y), is.null(X)) & !is.null(newdata)) warning("Original data needs to be passed to predict.regress when using SuperLearner and newdata.  predict may fail depending on the SL.library otherwise...")
+    if (any(is.null(Y), is.null(X)) & !missing(newdata)) warning("Original data needs to be passed to predict.regress when using SuperLearner and newdata.  predict may fail depending on the SL.library otherwise...")
     if (object$SL.version==1) {
-      if (is.null(newdata)) {
-        pred <- predict(object$fit)
+      if (missing(newdata)) {
+        return(predict(object$fit))
       } else {
-        pred <-  predict(object$fit, newdata=data.frame(newdata), X=X, Y=Y)$fit
+        return(predict(object$fit, newdata=data.frame(newdata), X=data.frame(X), Y=Y)$fit)
       }
     } else {
-      warning("This code (predict for new SL) has not been tested much")
-      pred <- predict(object$fit, newdata=newdata, X=X, Y=Y)
+      if(missing(newdata)) return(predict(object$fit)$pred)
+      return(predict(object$fit, newdata=data.frame(newdata), X=data.frame(X), Y=Y)$pred)
     }
   }
-  return(pred)
 }

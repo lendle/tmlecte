@@ -8,9 +8,9 @@ test_that("qlogis and plogis work as I expect", {
 })
 
 test_that("regress and predict.regress", {
-  X <- rnorm(100)
-  Y <- rnorm(100, 10+X, .1)
-  Ybin <- rbinom(100, 1, plogis(X))
+  X <- matrix(rnorm(200), 100, 2)
+  Y <- rnorm(100, 10+X[,1], .1)
+  Ybin <- rbinom(100, 1, plogis(X[,2]))
   expect_that(r1 <- regress(Y, X, family=gaussian), is_a("regress"))
   expect_that(r2 <- regress(Ybin, X), is_a("regress"))
   expect_that(predict(r1), is_a("numeric"))
@@ -22,9 +22,12 @@ test_that("regress and predict.regress", {
   } else {
     SL.version <- packageVersion("SuperLearner")$major
     if (SL.version==1) {
-      expect_that(rsl <- regress(Y, X, method="SL", family=gaussian(), SL.library="SL.glm"), gives_warning("SuperLearner is out of date"))
+      expect_that(rsl <- regress(Ybin, X, method="SL", family=binomial(), SL.library=c("SL.glm", "SL.knn")), gives_warning("SuperLearner is out of date"))
+    } else {
+      expect_that(rsl <- regress(Ybin, X, method="SL", family=binomial(), SL.library=c("SL.glm", "SL.knn")), is_a("regress"))
     }
     expect_that(predict(rsl), is_a("matrix"))
+    expect_that(predict(rsl, newdata=X, X=X, Y=Ybin), is_a("matrix"))    
   }
 })
 
