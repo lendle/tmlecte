@@ -1,6 +1,11 @@
-logit <- function(x) qlogis(x)
-logistic <- function(x) plogis(x)
-
+##' Prints results from tmle.cte.
+##'
+##' 
+##' @title \code{print.cte} function
+##' @param x an ojbect of class \code{cte}
+##' @param ... ignored
+##' @return Nothing
+##' @author Sam Lendle
 print.cte <- function(x, ...) {
   cat(x$estimand, ": ", x$psi,
       "\nEstimated Variance: ", x$var.psi,
@@ -14,28 +19,34 @@ print.cte <- function(x, ...) {
 ##' @title tmle.cte function
 ##' @param A binary treatment indicator where 1 is treated and 0 is
 ##' not treated 
-##' @param B a matrix or dataframe of covariates. In an RCT,
-##' can include baseline covariates here to control for baseline
-##' confounding
+##' @param B a matrix or dataframe of covariates. 
 ##' @param Y outcome variable. Currently should be in [0, 1], but can
 ##' be continuous.
 ##' @param a the treatment for which you want to estimate the
 ##' conditional effect, 1 or 0. 1 corresponds to the ATT, 0
 ##' corresponds to the ATN or NDE.
-##' @param Q.SL.library SuperLearner library for estimating Q
-##' @param g.SL.library SuperLearner library for estimating g
-##' @param family gaussian for a continuous outcome, binomial for a
+##' @param Q.method method to estimate \code{Q(A,B)=E(Y|A,B)}. Should be \code{"glm"} for glm or \code{"SL"} for SuperLearner.  If SuperLearner is not installed, glm is automatically used.
+##' @param Q.formula the formula for glm if glm is used to estimate \code{Q(A,B)}. The response variable should be calle d \code{Y} and the predictors should include \code{A} and variables in \code{B}.  If missing, defaults to $Y~.$ (main terms including \code{A} all variables in \code{B}).
+##' @param Q.SL.library SuperLearner library for estimating \code{Q(A,B)} if SuperLearner is used.
+##' @param g.method method to estimate \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm or \code{"SL"} for SuperLearner.  If SuperLearner is not installed, glm is automatically used.
+##' @param g.formula the formula for glm if glm is used to estimate \code{g(A=a|B)}. The response variable should be calle d \code{A} and the predictors should include variables in \code{B}.  If missing, defaults to $A~.$ (main terms including all variables in \code{B}).
+##' @param g.SL.library SuperLearner library for estimating \code{g(A=a|B)} if SuperLearner is used.
+##' @param family \code{gaussian} for a continuous outcome \code{Y}, \code{binomial} for a
 ##' biniomial outcome
 ##' @param tol convergence criterion, set to something small
-##' @param maxiter maximum number of targetting steps
-##' @param target TRUE to preform bias reduction step. FALSE to return
-##' simple G computation based estimate
+##' @param maxiter maximum number of targetting steps. 100 is good. If it takes more than that it's probably not going to converge.
+##' @param target TRUE to preform bias reduction (targeting)
+##' step. FALSE to return simple G computation based substitution
+##' estimate
 ##' @param verbose TRUE for details for each iteration
-##' @param Qbound bound Q away from 0 and 1
-##' @param gbound bound g away from 0 and 1
+##' @param Qbound a numeric vector containing minimum and maximum
+##' bounds for Q. Should be between 0 and 1 for now.  Set to something close to 0 and 1. 
+##' @param gbound a numeric vector containing minimum and maximum
+##' bounds for g. Should be between 0 and 1. Set to something close to 0 and 1.
 ##' @param ... aditional parameters to be passed to (both)
-##' SuperLearner calls
-##' @return adsf
+##' SuperLearner calls 
+##' @return An object of class \code{cte}
+##' <details on returned object>
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @export
 tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
@@ -141,18 +152,18 @@ tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=
       H2 <- (Q.A1-Q.A0 - psi)
 
       #Estimate epsilon for logistic fluctuation of Q and g
-      Q.up <- suppressWarnings(glm(Y~-1+H1, offset=logit(Q.AA), family=binomial))
+      Q.up <- suppressWarnings(glm(Y~-1+H1, offset=qlogis(Q.AA), family=binomial))
       #Q.up <- glm(Y~-1+H1, dat, offset=Q.AA, family=gaussian, subset=(Delta==1))
-      g.up <- glm(Aa~-1+H2, offset=logit(g.Aa), family=binomial)
+      g.up <- glm(Aa~-1+H2, offset=qlogis(g.Aa), family=binomial)
       eps <- c(coef(Q.up), coef(g.up))
       if (is.na(eps[2])) {eps[2] <- 0}
 
       #Fluctuate predicted outcome and treatment, Q and g
-      Q.A1 <- logistic(logit(Q.A1)+eps[1]*H1.A1)
+      Q.A1 <- plogis(qlogis(Q.A1)+eps[1]*H1.A1)
       #Q.A1 <- Q.A1+eps[1]*H1.A1
-      Q.A0 <- logistic(logit(Q.A0)+eps[1]*H1.A0)
+      Q.A0 <- plogis(qlogis(Q.A0)+eps[1]*H1.A0)
       #Q.A0 <- Q.A0+eps[1]*H1.A0
-      g.Aa <- logistic(logit(g.Aa)+eps[2]*H2)
+      g.Aa <- plogis(qlogis(g.Aa)+eps[2]*H2)
       
       crit <- max(abs(na.omit(eps)))
       if (crit <= tol || iter>=maxiter) {
