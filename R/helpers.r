@@ -22,10 +22,13 @@
 	return(x.colnames)
 }
 
-#---------- function .bound ---------------
-# set outliers to min/max allowable values
-# assumes x contains only numerical data
-#-----------------------------------------
+##' set outliers to min/max allowable values
+##'
+##' @title .bound function
+##' @param x object of numerical data, usually a matrix or vector
+##' @param bounds object of numeric data where the min is the minimum bound and the max is the maximum bound
+##' @return x with values less than \code{min(bounds)} set to \code{min(bounds)}, likewise for values greater than \code{max(bounds)}
+##' @author Susan Gruber
 .bound <- function(x, bounds){
 	x[x>max(bounds)] <- max(bounds)
 	x[x<min(bounds)] <- min(bounds)
@@ -40,7 +43,7 @@
 ##' @param include.D aasdf
 ##' @param A.coef asdf
 ##' @param pDelta asdf
-##' @return a data rame
+##' @return a data frame
 ##' @author Sam Lendle
 ##' @export
 gendata <- function(n, include.D=FALSE, A.coef=0, pDelta=NULL) {
