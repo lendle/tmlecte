@@ -6,6 +6,16 @@
 # 	firstChar - prefix for internally assigned name
 # return the names
 #-----------------------------------------
+##' <description>
+##'
+##' <details>
+##' @title <title>
+##' @param x.colnames 
+##' @param x.ncols 
+##' @param firstChar 
+##' @return <return>
+##' @author Susan Gruber
+##' @name setColnames
 .setColnames <- function(x.colnames, x.ncols, firstChar){
 	if(is.null(x.colnames)) {
 		if(x.ncols > 1){
@@ -29,6 +39,7 @@
 ##' @param bounds object of numeric data where the min is the minimum bound and the max is the maximum bound
 ##' @return x with values less than \code{min(bounds)} set to \code{min(bounds)}, likewise for values greater than \code{max(bounds)}
 ##' @author Susan Gruber
+##' @name bound
 .bound <- function(x, bounds){
 	x[x>max(bounds)] <- max(bounds)
 	x[x<min(bounds)] <- min(bounds)

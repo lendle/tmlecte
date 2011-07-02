@@ -1,5 +1,5 @@
-\name{.bound}
-\alias{.bound}
+\name{bound}
+\alias{bound}
 \title{.bound function}
 \usage{.bound(x, bounds)}
 \description{set outliers to min/max allowable values}
