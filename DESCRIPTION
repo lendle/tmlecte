@@ -19,4 +19,4 @@ Description: Estimates the Average Treatment effect among the Treated
 Version: 0.1-1
 Date: 2011-05-28
 Suggests: SuperLearner
-Collate: 'helpers.r' 'tmlecte-package.R' 'tmlecte.R'
+Collate: 'helpers.r' 'regress.R' 'tmlecte-package.R' 'tmlecte.R'
