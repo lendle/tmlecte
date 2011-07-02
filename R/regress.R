@@ -2,12 +2,12 @@
 ##'
 ##' <details>
 ##' @title <title>
-##' @param Y 
-##' @param X 
-##' @param family 
-##' @param method 
-##' @param formula 
-##' @param ... 
+##' @param Y dependent variable for regression
+##' @param X predictor variables for regression
+##' @param family error distribution. Can be \code{gaussian} or \code{binomial}
+##' @param method \code{"glm"} for glm or \code{"SL"} for SuperLearner
+##' @param formula regression formula for glm. Dependent variable should be called \code{Y}.  Defaults to \code{Y~.} if not specified.
+##' @param ... additional options to be passed to SuperLearner
 ##' @return <return>
 ##' @author Sam Lendle
 ##' @export
@@ -41,9 +41,15 @@ regress <- function(Y, X, family=binomial(), method="glm", formula=Y~., ...) {
 ##'
 ##' <details>
 ##' @title <title>
-##' @param object 
-##' @param newdata 
-##' @param ... 
+##' @param object an object of class \code{regress}
+##' @param newdata optional new data for prediction in the same format
+##' as \code{X} used in the original \code{regress} call
+##' @param X original predictors from the \code{regress} call. Needed
+##' for some prediction algorithms when using \code{newdata}
+##' @param Y original dependent variable from \code{regress}
+##' call. Needed for some prediction algorithms when using
+##' \code{newdata}
+##' @param ... ignored
 ##' @return <return>
 ##' @author Sam Lendle
 ##' @export

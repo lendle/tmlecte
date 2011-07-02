@@ -6,9 +6,9 @@
 \details{<details>}
 \value{<return>}
 \author{Sam Lendle}
-\arguments{\item{Y}{}
-\item{X}{}
-\item{family}{}
-\item{method}{}
-\item{formula}{}
-\item{...}{}}
+\arguments{\item{Y}{dependent variable for regression}
+\item{X}{predictor variables for regression}
+\item{family}{error distribution. Can be \code{gaussian} or \code{binomial}}
+\item{method}{\code{"glm"} for glm or \code{"SL"} for SuperLearner}
+\item{formula}{regression formula for glm. Dependent variable should be called \code{Y}.  Defaults to \code{Y~.} if not specified.}
+\item{...}{additional options to be passed to SuperLearner}}

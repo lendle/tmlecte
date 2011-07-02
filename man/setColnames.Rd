@@ -6,6 +6,6 @@
 \value{<return>}
 \author{Susan Gruber}
 \alias{.setColnames}
-\arguments{\item{x.colnames}{}
-\item{x.ncols}{}
-\item{firstChar}{}}
+\arguments{\item{x.colnames}{<description>}
+\item{x.ncols}{<description>}
+\item{firstChar}{<description>}}

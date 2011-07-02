@@ -6,4 +6,5 @@
 \author{Susan Gruber}
 \alias{.bound}
 \arguments{\item{x}{object of numerical data, usually a matrix or vector}
-\item{bounds}{object of numeric data where the min is the minimum bound and the max is the maximum bound}}
+\item{bounds}{object of numeric data where the min is the minimum
+bound and the max is the maximum bound}}

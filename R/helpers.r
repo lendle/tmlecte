@@ -10,9 +10,9 @@
 ##'
 ##' <details>
 ##' @title <title>
-##' @param x.colnames 
-##' @param x.ncols 
-##' @param firstChar 
+##' @param x.colnames <description>
+##' @param x.ncols <description>
+##' @param firstChar <description>
 ##' @return <return>
 ##' @author Susan Gruber
 ##' @name setColnames
@@ -37,7 +37,8 @@
 ##'
 ##' @title .bound function
 ##' @param x object of numerical data, usually a matrix or vector
-##' @param bounds object of numeric data where the min is the minimum bound and the max is the maximum bound
+##' @param bounds object of numeric data where the min is the minimum
+##' bound and the max is the maximum bound
 ##' @return x with values less than \code{min(bounds)} set to \code{min(bounds)}, likewise for values greater than \code{max(bounds)}
 ##' @author Susan Gruber
 ##' @name bound
@@ -73,11 +74,11 @@ gendata <- function(n, include.D=FALSE, A.coef=0, pDelta=NULL) {
   W4 <- rnorm(n, D-1, 1)
   pa <- numeric(n)
   #pa[D==1] <- logistic(-1+1.7*W1+0.25*W3)[D==1]
-  pa[D==1] <- logistic(-1+1.7*W1+0.25*W3+W4)[D==1]
+  pa[D==1] <- plogis(-1+1.7*W1+0.25*W3+W4)[D==1]
   #pa[D==1] <- logistic(-3+1.7*W1+0.25*W3+4*(W4>=0))[D==1]
-  pa[D==2] <- logistic(-1+W1-0.2*W2 + 0.4*W4)[D==2]
+  pa[D==2] <- plogis(-1+W1-0.2*W2 + 0.4*W4)[D==2]
   A <- rbinom(n, 1, pa)
-  Y <- rbinom(n, 1, logistic(-1+A.coef*A+0.5*W1-2*W2))
+  Y <- rbinom(n, 1, plogis(-1+A.coef*A+0.5*W1-2*W2))
   Delta <- rbinom(n, 1, pDelta(A=A, W1=W1, W2=W2, W3=W3, W4=W4))
   data.frame(D, W1, W2, W3, W4, A, Y, Delta, pa)
 }
