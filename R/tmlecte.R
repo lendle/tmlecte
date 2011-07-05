@@ -62,9 +62,8 @@ tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=
   if (!(family$family %in% c("gaussian", "binomial"))) {
     stop("Currently only gaussian and binomial families are supported")
   }
-
   if (is.null(Q.SL.library)) {
-    if (family$family=="guassian") {
+    if (family$family=="gaussian") {
       Q.SL.library <- c("SL.glm", "SL.step")
     } else {
       Q.SL.library <- c("SL.glm", "SL.step", "SL.knn")
