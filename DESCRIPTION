@@ -20,3 +20,4 @@ Enhances: SuperLearner
 Version: 0.1-1
 Date: 2011-05-28
 Collate: 'helpers.r' 'regress.R' 'tmlecte-package.R' 'tmlecte.R'
+    'tmlende.R'
