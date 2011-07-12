@@ -90,6 +90,7 @@ tmle.cte <- function(A, B, Y, a=0, Q.method="glm", Q.formula=NULL, Q.SL.library=
   #g.init.fit <- SuperLearner(A, B, SL.library=g.SL.library, family=binomial,...)
   g.init.fit <- regress(A, B, family=binomial,
                         method=g.method,
+                        formula=g.formula,
                         SL.library=g.SL.library,
                         ...)
   g.A1 <- .bound(predict(g.init.fit), gbound)
