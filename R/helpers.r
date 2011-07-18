@@ -59,7 +59,6 @@
 ##' @param pDelta asdf
 ##' @return a data frame
 ##' @author Sam Lendle
-##' @export
 gendata <- function(n, include.D=FALSE, A.coef=0, pDelta=NULL) {
   if (is.null(pDelta)) pDelta <- function(...){1}
   #If include.D is false, D will be set to one for everyone
