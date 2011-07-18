@@ -10,8 +10,10 @@ test_that("qlogis and plogis work as I expect", {
 test_that("regress and predict.regress", {
   X <- matrix(rnorm(200), 100, 2)
   Y <- rnorm(100, 10+X[,1], .1)
+  A <- Y
   Ybin <- rbinom(100, 1, plogis(X[,2]))
-  expect_that(r1 <- regress(Y, X, family=gaussian), is_a("regress"))
+  expect_that(r1 <- regress(Y, X, formula= A ~ X, family=gaussian), is_a("regress"))
+  expect_that(regress(A, X, formula= blah ~ X, family=gaussian), is_a("regress"))  
   expect_that(r2 <- regress(Ybin, X), is_a("regress"))
   expect_that(predict(r1), is_a("numeric"))
   expect_that(pr2 <- predict(r2), is_a("numeric"))
