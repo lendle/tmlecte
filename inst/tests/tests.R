@@ -1,11 +1,4 @@
-context("Just some function checks")
-
-test_that("qlogis and plogis work as I expect", {
-  x <- -10:10
-  y <- seq(.1, .9, .1)
-  expect_that(plogis(x), equals(1/(1+exp(-x))))
-  expect_that(qlogis(y), equals(log(y/(1-y))))
-})
+context("Checking regress")
 
 test_that("regress and predict.regress", {
   X <- matrix(rnorm(200), 100, 2)
@@ -33,3 +26,18 @@ test_that("regress and predict.regress", {
   }
 })
 
+context("Checking tmle.cte")
+
+test_that("tmle.cte handles specification of missing outcomes correctly", {
+  set.seed(123)
+  Y <- rbinom(100, 1, .5)
+  A <- rbinom(100, 1, .5)
+  B <- data.frame(W1=runif(100))
+  Delta <- c(rep(1, 90), rep(0, 10))
+  expect_that(tmle.cte(A, B, Y, Delta=Delta), is_a("cte"))
+  Y[Delta==0] <- NA
+  expect_that(t <- tmle.cte(A, B, Y, Delta=Delta), is_a("cte"))
+  expect_that(t <- tmle.cte(A, B, Y), gives_warning("but Delta is NULL"))
+  expect_that(t <- tmle.cte(A, B, Y, Delta=1), gives_warning("Delta is the wrong length"))
+  expect_that(t <- tmle.cte(A, B, Y, Delta=rep(1,100)), gives_warning("Y are NA where Delta is 1"))  
+})
