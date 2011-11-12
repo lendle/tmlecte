@@ -56,6 +56,7 @@ regress <- function(resp, X, family=binomial(), method="glm", formula=resp ~ ., 
 ##' @param ... ignored
 ##' @return <return>
 ##' @author Sam Lendle
+##' @method predict regress
 ##' @export
 predict.regress <- function(object, newdata, X=NULL, Y=NULL, ...) {
   if (object$method=="glm") {
