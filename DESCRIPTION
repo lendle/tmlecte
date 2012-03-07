@@ -17,11 +17,12 @@ Description: Estimates the Average Treatment effect among the Treated
     is a working package.  The methods in this package will likely be
     made available in the tmle package on CRAN in the future.
 Enhances: SuperLearner
-Version: 0.1-1
-Date: 2011-05-28
+Version: 0.2-1
+Date: 2012-03-07
 Collate:
     'helpers.r'
     'regress.R'
     'tmlecte-package.R'
     'tmlecte.R'
     'tmlende.R'
+    'tmleatt.R'
