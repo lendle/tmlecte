@@ -3,13 +3,14 @@
 \title{tmle.cte function}
 \usage{
   tmle.cte(A, B, Y, a = 0, Delta = NULL, Q.method = "glm",
-    Q.formula = NULL, Q.SL.library = NULL,
-    g.method = "glm", g.formula = NULL,
+    Q.formula = NULL, Q.SL.library = NULL, Q.A1 = NULL,
+    Q.A0 = NULL, g.method = "glm", g.formula = NULL,
     g.SL.library = c("SL.glm", "SL.step", "SL.knn"),
-    gDelta.method = "glm", gDelta.formula = NULL,
+    g.A1 = NULL, gDelta.method = "glm",
+    gDelta.formula = NULL,
     gDelta.SL.library = c("SL.glm", "SL.step", "SL.knn"),
-    family = gaussian(), tol = 1e-10, maxiter = 100,
-    target = TRUE, verbose = FALSE,
+    gDelta.1 = NULL, family = gaussian(), tol = 1e-10,
+    maxiter = 100, target = TRUE, verbose = FALSE,
     Qbound = c(1e-10, 1 - 1e-10),
     gbound = c(1e-10, 1 - 1e-10), ...)
 }
@@ -31,9 +32,11 @@
   \code{NA}, and 1 otherwise.}
 
   \item{Q.method}{method to estimate
-  \code{Q(A,B)=E(Y|A,B)}. Should be \code{"glm"} for glm or
-  \code{"SL"} for SuperLearner.  If SuperLearner is not
-  installed, glm is automatically used.}
+  \code{Q(A,B)=E(Y|A,B)}. Should be \code{"glm"} for glm,
+  \code{"SL"} for SuperLearner, or \code{"user"} for user
+  specified estimates of \code{g(A=1|B)}. If SuperLearner
+  is specified but not installed, glm is automatically
+  used.}
 
   \item{Q.formula}{the formula for glm if glm is used to
   estimate \code{Q(A,B)}. The response variable should be
@@ -45,10 +48,20 @@
   \item{Q.SL.library}{SuperLearner library for estimating
   \code{Q(A,B)} if SuperLearner is used.}
 
+  \item{Q.A1}{User specified estimates of \code{Q(1|B)}.
+  Should be the same length as \code{Y} if \code{Q.method}
+  is \code{"user"}.}
+
+  \item{Q.A0}{User specified estimates of \code{Q(0|B)}.
+  Should be the same length as \code{Y} if \code{Q.method}
+  is \code{"user"}.}
+
   \item{g.method}{method to estimate
-  \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm
-  or \code{"SL"} for SuperLearner.  If SuperLearner is not
-  installed, glm is automatically used.}
+  \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm,
+  \code{"SL"} for SuperLearner, or \code{"user"} for user
+  specified estimates of \code{g(A=1|B)}. If SuperLearner
+  is specified but not installed, glm is automatically
+  used.}
 
   \item{g.formula}{the formula for glm if glm is used to
   estimate \code{g(A=a|B)}. The response variable should be
@@ -59,10 +72,18 @@
   \item{g.SL.library}{SuperLearner library for estimating
   \code{g(A=a|B)} if SuperLearner is used.}
 
+  \item{g.A1}{User specified estimates of \code{g(A=1|B)}.
+  Should be the same length as \code{Y} if \code{g.method}
+  is \code{"user"}. Note: this is the estimate for
+  \code{g(A=1|B)} even if \code{a=0} (e.g. for the NDE or
+  for the ATN).}
+
   \item{gDelta.method}{method to estimate
-  \code{P(Delta=1|A, B)}. Should be \code{"glm"} for glm or
-  \code{"SL"} for SuperLearner.  If SuperLearner is not
-  installed, glm is automatically used.}
+  \code{P(Delta=1|A, B)}. Should be \code{"glm"} for glm,
+  \code{"SL"} for SuperLearner, or \code{"user"} for user
+  specified estimates of \code{g(A=1|B)}. If SuperLearner
+  is specified but not installed, glm is automatically
+  used.}
 
   \item{gDelta.formula}{the formula for glm if glm is used
   to estimate \code{P(Delta=1|A, B)}. The response variable
@@ -74,6 +95,10 @@
   \item{gDelta.SL.library}{SuperLearner library for
   estimating \code{P(Delta=1|A,B)} if SuperLearner is
   used.}
+
+  \item{gDelta.1}{User specified estimates of
+  \code{P(Delta=1|A,B)}.  Should be the same length as
+  \code{Y} if \code{gDelta.method} is \code{"user"}.}
 
   \item{family}{\code{gaussian} for a continuous outcome
   \code{Y}, \code{binomial} for a biniomial outcome}
@@ -99,7 +124,7 @@
   something close to 0 and 1.}
 
   \item{...}{aditional parameters to be passed to (both)
-  SuperLearner calls}
+  perLearner calls}
 }
 \value{
   An object of class \code{cte} <details on returned

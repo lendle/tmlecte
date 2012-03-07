@@ -28,9 +28,9 @@ print.cte <- function(x, ...) {
 ##' conditional effect, 1 or 0. 1 corresponds to the ATT, 0
 ##' corresponds to the ATN or NDE.
 ##' @param Delta binary indicator of missing outcome.  Should be 0 where \code{Y} is \code{NA} or should be treated as \code{NA}, and 1 otherwise.
-##' @param Q.method method to estimate \code{Q(A,B)=E(Y|A,B)}. Should
-##' be \code{"glm"} for glm or \code{"SL"} for SuperLearner.  If
-##' SuperLearner is not installed, glm is automatically used.
+##' @param Q.method method to estimate \code{Q(A,B)=E(Y|A,B)}. Should be \code{"glm"} for glm,
+##' \code{"SL"} for SuperLearner, or \code{"user"} for user specified estimates of
+##' \code{g(A=1|B)}. If SuperLearner is specified but not installed, glm is automatically used.
 ##' @param Q.formula the formula for glm if glm is used to estimate
 ##' \code{Q(A,B)}. The response variable should be calle d \code{Y}
 ##' and the predictors should include \code{A} and variables in
@@ -38,10 +38,14 @@ print.cte <- function(x, ...) {
 ##' \code{A} all variables in \code{B}).
 ##' @param Q.SL.library SuperLearner library for estimating
 ##' \code{Q(A,B)} if SuperLearner is used.
+##' @param Q.A1 User specified estimates of \code{Q(1|B)}.  Should be the same length as
+##' \code{Y} if \code{Q.method} is \code{"user"}.
+##' @param Q.A0 User specified estimates of \code{Q(0|B)}.  Should be the same length as
+##' \code{Y} if \code{Q.method} is \code{"user"}.
 ##' @param g.method method to estimate
-##' \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm or
-##' \code{"SL"} for SuperLearner.  If SuperLearner is not installed,
-##' glm is automatically used.
+##' \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm,
+##' \code{"SL"} for SuperLearner, or \code{"user"} for user specified estimates of
+##' \code{g(A=1|B)}. If SuperLearner is specified but not installed, glm is automatically used.
 ##' @param g.formula the formula for glm if glm is used to estimate
 ##' \code{g(A=a|B)}. The response variable should be calle d \code{A}
 ##' and the predictors should include variables in \code{B}.  If
@@ -49,10 +53,13 @@ print.cte <- function(x, ...) {
 ##' \code{B}).
 ##' @param g.SL.library SuperLearner library for estimating
 ##' \code{g(A=a|B)} if SuperLearner is used.
+##' @param g.A1 User specified estimates of \code{g(A=1|B)}.  Should be the same length as
+##' \code{Y} if \code{g.method} is \code{"user"}. Note: this is the estimate for \code{g(A=1|B)}
+##' even if \code{a=0} (e.g. for the NDE or for the ATN).
 ##' @param gDelta.method method to estimate
-##' \code{P(Delta=1|A, B)}. Should be \code{"glm"} for glm or
-##' \code{"SL"} for SuperLearner.  If SuperLearner is not installed,
-##' glm is automatically used.
+##' \code{P(Delta=1|A, B)}. Should be \code{"glm"} for glm,
+##' \code{"SL"} for SuperLearner, or \code{"user"} for user specified estimates of
+##' \code{g(A=1|B)}. If SuperLearner is specified but not installed, glm is automatically used.
 ##' @param gDelta.formula the formula for glm if glm is used to
 ##' estimate \code{P(Delta=1|A, B)}. The response variable should be
 ##' called \code{Delta} and the predictors should include \code{A} and
@@ -60,6 +67,8 @@ print.cte <- function(x, ...) {
 ##' terms including \code{A} and all variables in \code{B}).
 ##' @param gDelta.SL.library SuperLearner library for estimating
 ##' \code{P(Delta=1|A,B)} if SuperLearner is used.
+##' @param gDelta.1 User specified estimates of \code{P(Delta=1|A,B)}.  Should be the same length as
+##' \code{Y} if \code{gDelta.method} is \code{"user"}.
 ##' @param family \code{gaussian} for a continuous outcome \code{Y},
 ##' \code{binomial} for a biniomial outcome
 ##' @param tol convergence criterion, set to something small
@@ -76,12 +85,12 @@ print.cte <- function(x, ...) {
 ##' bounds for g. Should be between 0 and 1. Set to something close to
 ##' 0 and 1.
 ##' @param ... aditional parameters to be passed to (both)
-##' SuperLearner calls 
+##'perLearner calls 
 ##' @return An object of class \code{cte}
 ##' <details on returned object>
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @export
-tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
+tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
   if (is.character(family)) 
     family <- get(family, mode = "function", envir = parent.frame())
@@ -120,37 +129,58 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
       Delta[is.na(Y)] <- 0
     }
   }
+
+  if (Q.method == "user" && (length(Q.A1) != length(Y) || length(Q.A0) != length(Y))) {
+    stop ("The length of user specified Q.A1 and Q.A0 should be the same as the length of Y")
+  }
+  if (g.method == "user" && length(g.A1) != length(Y)) {
+    stop ("The length of user specified g.A1 should be the same as the length of Y")
+  }
+  if (missing.outcome && gDelta.method == "user" && length(gDelta.1) != length(Y)) {
+    stop ("The length of user specified gDelta.1 should be the same as the length of Y")
+  }
+  
+  
   Y[Delta==0] <- NA
     
   Aa <- as.numeric(A==a)
 
-  Q.init.fit <- regress(Y[Delta==1],
-                        data.frame(A=A, B)[Delta==1,],
-                        family=family,
-                        method=Q.method,
-                        formula=Q.formula,
-                        SL.library=Q.SL.library,
-                        ...)
+  if (Q.method != "user") {
+    Q.init.fit <- regress(Y[Delta==1],
+                          data.frame(A=A, B)[Delta==1,],
+                          family=family,
+                          method=Q.method,
+                          formula=Q.formula,
+                          SL.library=Q.SL.library,
+                          ...)
 
-  Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
-  Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
+    Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
+    Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
+  }
 
-  g.init.fit <- regress(A, B, family=binomial,
-                        method=g.method,
-                        formula=g.formula,
-                        SL.library=g.SL.library,
-                        ...)
-  g.A1 <- .bound(predict(g.init.fit), gbound)
+  if (g.method != "user") {
+    g.init.fit <- regress(A, B, family=binomial,
+                          method=g.method,
+                          formula=g.formula,
+                          SL.library=g.SL.library,
+                          ...)
+  g.A1 <- predict(g.init.fit)
+  }
+  g.A1 <- .bound(g.A1, gbound)
   g.A0 <- 1-g.A1
   g.Aa <- a*g.A1 + (1-a)*g.A0
 
   if (missing.outcome) {
-   gDelta.fit <- regress(Delta,
-                         data.frame(A=A, B),
-                         formula=gDelta.formula,
-                         SL.library=g.SL.library,
-                         ...)
-   gDelta.1 <- .bound(predict(gDelta.fit), c(1, min(gbound)))
+    if (gDelta.method != "user") {
+      gDelta.fit <- regress(Delta,
+                            data.frame(A=A, B),
+                            method=gDelta.method,
+                            formula=gDelta.formula,
+                            SL.library=g.SL.library,
+                            ...)
+      gDelta.1 <- predict(gDelta.fit)
+    }
+    gDelta.1 <- .bound(gDelta.1, c(1, min(gbound)))
   } else {
    gDelta.1 <- rep(1, length(Y))
   }
