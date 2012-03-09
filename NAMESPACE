@@ -1,5 +1,4 @@
 export(regress)
-export(tmle.att)
 export(tmle.cte)
 export(tmle.nde)
 S3method(predict,regress)

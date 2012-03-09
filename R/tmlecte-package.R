@@ -3,7 +3,7 @@
 ##' \tabular{ll}{
 ##' Package: \tab tmlecte\cr
 ##' Type: \tab Package\cr
-##' Version: \tab 0.2-2\cr
+##' Version: \tab 0.1-1\cr
 ##' Date: \tab 2011-06-29\cr
 ##' License: \tab GPL (>= 2)\cr
 ##' LazyLoad: \tab yes\cr

@@ -79,8 +79,8 @@ print.cte <- function(x, ...) {
 ##' estimate
 ##' @param verbose TRUE for details for each iteration
 ##' @param Qbound a numeric vector containing minimum and maximum
-##' bounds for Q. Defaults to the min and max of \code{Y} if family is \code{gaussian} or
-##' c(1e-10, 1-1e-10) if family is \code{binomial}. 
+##' bounds for Q. Should be between 0 and 1 for now.  Set to something
+##' close to 0 and 1. 
 ##' @param gbound a numeric vector containing minimum and maximum
 ##' bounds for g. Should be between 0 and 1. Set to something close to
 ##' 0 and 1.
@@ -90,7 +90,7 @@ print.cte <- function(x, ...) {
 ##' <details on returned object>
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @export
-tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=NULL, gbound=c(1e-10, 1-1e-10), ...) {
+tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
   if (is.character(family)) 
     family <- get(family, mode = "function", envir = parent.frame())
@@ -103,12 +103,6 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
   if (!(family$family %in% c("gaussian", "binomial"))) {
     stop("Currently only gaussian and binomial families are supported")
   }
-
-  if (is.null(Q.bound)) {
-    if (family$family=="gaussian") Qbound=c(min(Y), max(Y))
-    if (family$family=="binomial") Qbound=c(1e-10, 1-1e-10)
-  }
-
   if (is.null(Q.SL.library)) {
     if (family$family=="gaussian") {
       Q.SL.library <- c("SL.glm", "SL.step")

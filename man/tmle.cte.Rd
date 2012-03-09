@@ -11,7 +11,8 @@
     gDelta.SL.library = c("SL.glm", "SL.step", "SL.knn"),
     gDelta.1 = NULL, family = gaussian(), tol = 1e-10,
     maxiter = 100, target = TRUE, verbose = FALSE,
-    Qbound = NULL, gbound = c(1e-10, 1 - 1e-10), ...)
+    Qbound = c(1e-10, 1 - 1e-10),
+    gbound = c(1e-10, 1 - 1e-10), ...)
 }
 \arguments{
   \item{A}{binary treatment indicator where 1 is treated
@@ -115,9 +116,8 @@
   \item{verbose}{TRUE for details for each iteration}
 
   \item{Qbound}{a numeric vector containing minimum and
-  maximum bounds for Q. Defaults to the min and max of
-  \code{Y} if family is \code{gaussian} or c(1e-10,
-  1-1e-10) if family is \code{binomial}.}
+  maximum bounds for Q. Should be between 0 and 1 for now.
+  Set to something close to 0 and 1.}
 
   \item{gbound}{a numeric vector containing minimum and
   maximum bounds for g. Should be between 0 and 1. Set to
