@@ -92,6 +92,7 @@ print.cte <- function(x, ...) {
 ##' @export
 tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
+  #require(SuperLearner)
   if (is.character(family)) 
     family <- get(family, mode = "function", envir = parent.frame())
   if (is.function(family)) 
@@ -139,32 +140,46 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
   if (missing.outcome && gDelta.method == "user" && length(gDelta.1) != length(Y)) {
     stop ("The length of user specified gDelta.1 should be the same as the length of Y")
   }
-  
+
+  id <- 1:length(Y)
   
   Y[Delta==0] <- NA
     
   Aa <- as.numeric(A==a)
 
   if (Q.method != "user") {
-    Q.init.fit <- regress(Y[Delta==1],
-                          data.frame(A=A, B)[Delta==1,],
-                          family=family,
-                          method=Q.method,
-                          formula=Q.formula,
-                          SL.library=Q.SL.library,
-                          ...)
+    ## Q.init.fit <- regress(Y[Delta==1],
+    ##                       data.frame(A=A, B)[Delta==1,],
+    ##                       family=family,
+    ##                       method=Q.method,
+    ##                       formula=Q.formula,
+    ##                       SL.library=Q.SL.library,
+    ##                       ...)
 
-    Q.A1 <- predict(Q.init.fit, newdata=data.frame(A=1, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
-    Q.A0 <- predict(Q.init.fit, newdata=data.frame(A=0, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
+    QQ <- estimateQ(Y=Y,
+                    Z=0, #XXX
+                    A=A,
+                    W=B,
+                    Delta=Delta,
+                    Q=NULL,
+                    Qbounds=Qbound,
+                    Qform=Q.formula,
+                    maptoYstar=FALSE, #XXX
+                    SL.library=Q.SL.library,
+                    cvQinit=FALSE,
+                    family=family,
+                    id=id,
+                    verbose=verbose)
+
+    #Not using Q(A,W) because I calculate for each iteration until convergence, below
+    Q.A1 <- QQ$Q[,"Q1W"] #predict(Q.init.fit, newdata=data.frame(A=1, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
+    Q.A0 <- QQ$Q[,"Q0W"] #predict(Q.init.fit, newdata=data.frame(A=0, B), X=data.frame(A=A, B)[Delta==1,], Y=Y[Delta==1])
   }
 
   if (g.method != "user") {
-    g.init.fit <- regress(A, B, family=binomial,
-                          method=g.method,
-                          formula=g.formula,
-                          SL.library=g.SL.library,
-                          ...)
-  g.A1 <- predict(g.init.fit)
+    g.A1 <- estimateG(d=data.frame(A, B), g1W=g.A1, gform=g.formula, SL.library=g.SL.library,
+                      id=id, verbose=verbose, message="treatment mechanism", outcome="A")$g1W
+
   }
   g.A1 <- .bound(g.A1, gbound)
   g.A0 <- 1-g.A1
@@ -172,13 +187,11 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
 
   if (missing.outcome) {
     if (gDelta.method != "user") {
-      gDelta.fit <- regress(Delta,
-                            data.frame(A=A, B),
-                            method=gDelta.method,
-                            formula=gDelta.formula,
-                            SL.library=g.SL.library,
-                            ...)
-      gDelta.1 <- predict(gDelta.fit)
+      
+      gDelta.1 <- estimateG(d=data.frame(Delta, A, B), g1W=gDelta.1, gform=gDelta.formula,
+                            SL.library=g.SL.library, message="missingness mechanism", outcome="A")$g1W
+      ##SUSAN: I only want P(Delta=1|A=A, W=W), so I'm saying outcome="A" in hopes that it works that way (as opposed to "D" or "A"). I don't need a matrix of P(Delta=1|A=1, W) and P(Delta=1|A=0, W)
+      
     }
     gDelta.1 <- .bound(gDelta.1, c(1, min(gbound)))
   } else {
