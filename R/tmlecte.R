@@ -5,7 +5,7 @@
 ##' @param x an ojbect of class \code{cte}
 ##' @param ... ignored
 ##' @return Nothing
-##' @author Sam Lendle
+##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @method print cte
 ##' @export
 print.cte <- function(x, ...) {
@@ -17,7 +17,7 @@ print.cte <- function(x, ...) {
 
 
 
-##' Estimates the statistical parameter E(E(Y|A=1,W)-E(Y|A=0,W)|A=a) using Targetted Maximum Likelihood.
+##' Estimates the statistical parameter \emph{E(E(Y|A=1,W)-E(Y|A=0,W)|A=a)} using Targetted Maximum Likelihood.
 ##'
 ##' If \code{target} is \code{FALSE}, the targetting step is not done, and a G-computation type estimate based only on the inital estimate of Q is returned.  In this case, the influence curve, variance estimate, confidence interval and p-value are not calculated.
 ##' 
