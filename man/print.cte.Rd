@@ -18,4 +18,8 @@
 \author{
   Sam Lendle \email{lendle@stat.berkeley.edu}
 }
+\seealso{
+  \code{\link{tmle.cte}}, \code{\link{tmle.att}},
+  \code{\link{tmle.ndeu}}
+}
 

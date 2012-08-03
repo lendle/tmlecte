@@ -1,6 +1,6 @@
 \name{tmle.cte}
 \alias{tmle.cte}
-\title{TMLE for statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]}}
+\title{TMLE for statistical parameter \emph{E[E(Y|A=1,B)-E(Y|A=0,B)|A=a]}}
 \usage{
   tmle.cte(Y, A, B, a = 0, Delta = NULL, Q = NULL,
     Qform = NULL,
@@ -122,7 +122,7 @@
 }
 \description{
   Estimates the statistical parameter
-  \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]} using Targetted
+  \emph{E[E(Y|A=1,B)-E(Y|A=0,B)|A=a]} using Targetted
   Maximum Likelihood.
 }
 \details{
@@ -143,6 +143,7 @@
   Sam Lendle \email{lendle@stat.berkeley.edu}
 }
 \seealso{
-  \code{\link{tmle.att}}, \code{\link{tmle.ndeu}}
+  \code{\link{tmle.att}}, \code{\link{tmle.ndeu}},
+  \code{\link{print.cte}}
 }
 

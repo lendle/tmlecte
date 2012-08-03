@@ -7,6 +7,7 @@
 ##' @return Nothing
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @method print cte
+##' @seealso \code{\link{tmle.cte}}, \code{\link{tmle.att}}, \code{\link{tmle.ndeu}}
 ##' @export
 print.cte <- function(x, ...) {
   cat(x$estimand, ": ", x$psi,
@@ -17,14 +18,14 @@ print.cte <- function(x, ...) {
 
 
 
-##' Estimates the statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]} using Targetted Maximum Likelihood.
+##' Estimates the statistical parameter \emph{E[E(Y|A=1,B)-E(Y|A=0,B)|A=a]} using Targetted Maximum Likelihood.
 ##'
 ##' If \code{target} is \code{FALSE}, the targetting step is not done, and a G-computation type estimate based only on the inital estimate of Q is returned.  In this case, the influence curve, variance estimate, confidence interval and p-value are not calculated.
 ##' 
 ##' Q.SL.library defaults to ('SL.glm', 'SL.step', 'SL.glm.interaction')
 ##' g.SL.library Defaults to ('SL.glm', 'SL.step', 'SL.glm.interaction')
 ##' This choice is simply because these algorithms are included in the base R installation. See SuperLearner help files for further information.
-##' @title TMLE for statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]}
+##' @title TMLE for statistical parameter \emph{E[E(Y|A=1,B)-E(Y|A=0,B)|A=a]}
 ##' @param Y continuous or binary outcome variable
 ##' @param A binary treatment indicator, \code{1} - treatment, \code{0} - control
 ##' @param B vector, matrix, or dataframe containing covariates to control for. Baseline covariates for the ATT,
@@ -70,7 +71,7 @@ print.cte <- function(x, ...) {
 ##' If convergence fails, all items are either \code{NA} or \code{NULL}.
 ##' If \code{target==FALSE}, some items are \code{NA} or \code{NULL}.
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
-##' @seealso \code{\link{tmle.att}}, \code{\link{tmle.ndeu}}
+##' @seealso \code{\link{tmle.att}}, \code{\link{tmle.ndeu}}, \code{\link{print.cte}}
 ##' @export
 tmle.cte <- function(Y, A, B,
                      a=0,
