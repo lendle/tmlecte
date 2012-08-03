@@ -1,144 +1,148 @@
 \name{tmle.cte}
 \alias{tmle.cte}
-\title{tmle.cte function}
+\title{tmle.cte}
 \usage{
-  tmle.cte(A, B, Y, a = 0, Delta = NULL, Q.method = "glm",
-    Q.formula = NULL, Q.SL.library = NULL, Q.A1 = NULL,
-    Q.A0 = NULL, g.method = "glm", g.formula = NULL,
-    g.SL.library = c("SL.glm", "SL.step", "SL.knn"),
-    g.A1 = NULL, gDelta.method = "glm",
-    gDelta.formula = NULL,
-    gDelta.SL.library = c("SL.glm", "SL.step", "SL.knn"),
-    gDelta.1 = NULL, family = gaussian(), tol = 1e-10,
-    maxiter = 100, target = TRUE, verbose = FALSE,
-    Qbound = c(1e-10, 1 - 1e-10),
-    gbound = c(1e-10, 1 - 1e-10), ...)
+  tmle.cte(Y, A, B, a = 0, Delta = NULL, Q = NULL,
+    Qform = NULL,
+    Q.SL.library = c("SL.glm",<c2><a0>"SL.step",<c2><a0>"SL.glm.interaction"),
+    Qbounds = NULL, g1W = NULL, gform = NULL,
+    gbound = 0.001, pDelta1 = NULL, g.Deltaform,
+    g.SL.library = c("SL.glm",<c2><a0>"SL.step",<c2><a0>"SL.glm.interaction"),
+    family = gaussian(),
+    fluctuation = c("logistic",<c2><a0>"linear"),
+    alpha = 0.995, id = 1:length(Y), target = TRUE,
+    tol = sqrt(.Machine$double.eps), maxiter = 100,
+    verbose = FALSE)
 }
 \arguments{
-  \item{A}{binary treatment indicator where 1 is treated
-  and 0 is not treated}
+  \item{Y}{continuous or binary outcome variable}
 
-  \item{B}{a matrix or dataframe of covariates.}
+  \item{A}{binary treatment indicator, \code{1} -
+  treatment, \code{0} - control}
 
-  \item{Y}{outcome variable. Currently should be in [0, 1],
-  but can be continuous.}
+  \item{B}{vector, matrix, or dataframe containing
+  covariates to control for. Baseline covariates for the
+  ATT, baseline covariates and mediator for NDEU}
 
   \item{a}{the treatment for which you want to estimate the
-  conditional effect, 1 or 0. 1 corresponds to the ATT, 0
-  corresponds to the ATN or NDE.}
+  conditional effect, \code{1} or \code{0}. \code{1}
+  corresponds to the ATT, \code{0} corresponds to the ATN
+  or NDE.}
 
-  \item{Delta}{binary indicator of missing outcome.  Should
-  be 0 where \code{Y} is \code{NA} or should be treated as
-  \code{NA}, and 1 otherwise.}
+  \item{Delta}{indicator of missing outcome or treatment
+  assignment. \code{1} - observed, \code{0} - missing}
 
-  \item{Q.method}{method to estimate
-  \code{Q(A,B)=E(Y|A,B)}. Should be \code{"glm"} for glm,
-  \code{"SL"} for SuperLearner, or \code{"user"} for user
-  specified estimates of \code{g(A=1|B)}. If SuperLearner
-  is specified but not installed, glm is automatically
-  used.}
+  \item{Q}{optional \emph{nx2} matrix of initial values for
+  Q portion of the likelihood, \emph{(E(Y|A=0,B),
+  E(Y|A=1,B))}}
 
-  \item{Q.formula}{the formula for glm if glm is used to
-  estimate \code{Q(A,B)}. The response variable should be
-  calle d \code{Y} and the predictors should include
-  \code{A} and variables in \code{B}.  If missing, defaults
-  to \code{Y~.} (main terms including \code{A} all
-  variables in \code{B}).}
+  \item{Qform}{optional regression formula for estimation
+  of \emph{E(Y|A,B)}, suitable for call to \code{glm}}
 
-  \item{Q.SL.library}{SuperLearner library for estimating
-  \code{Q(A,B)} if SuperLearner is used.}
+  \item{Q.SL.library}{optional vector of prediction
+  algorithms to use for \code{SuperLearner} estimation of
+  initial Q}
 
-  \item{Q.A1}{User specified estimates of \code{Q(1|B)}.
-  Should be the same length as \code{Y} if \code{Q.method}
-  is \code{"user"}.}
+  \item{Qbounds}{vector of upper and lower bounds on Y and
+  predicted values for initial \code{Q}. Defaults to the
+  range of \code{Y}, widened by 10\% of the min and max
+  values.}
 
-  \item{Q.A0}{User specified estimates of \code{Q(0|B)}.
-  Should be the same length as \code{Y} if \code{Q.method}
-  is \code{"user"}.}
+  \item{g1W}{optional vector of conditional treatment
+  assingment probabilities, \emph{P(A=1|B)}}
 
-  \item{g.method}{method to estimate
-  \code{g(A=a|B)=P(A=a|B)}. Should be \code{"glm"} for glm,
-  \code{"SL"} for SuperLearner, or \code{"user"} for user
-  specified estimates of \code{g(A=1|B)}. If SuperLearner
-  is specified but not installed, glm is automatically
-  used.}
+  \item{gform}{optional regression formula of the form A~W,
+  if specified this overrides the call to
+  \code{SuperLearner}}
 
-  \item{g.formula}{the formula for glm if glm is used to
-  estimate \code{g(A=a|B)}. The response variable should be
-  calle d \code{A} and the predictors should include
-  variables in \code{B}.  If missing, defaults to $A~.$
-  (main terms including all variables in \code{B}).}
+  \item{gbound}{value between (0,1) for truncation of
+  predicted probabilities. See \code{Details} section for
+  more information}
 
-  \item{g.SL.library}{SuperLearner library for estimating
-  \code{g(A=a|B)} if SuperLearner is used.}
+  \item{pDelta1}{optional matrix of conditional
+  probabilities for missingness mechanism with dimension
+  \emph{nx2} \emph{P(Delta=1|A=0,B)},
+  \emph{P(Delta=1|A=1,B)}}
 
-  \item{g.A1}{User specified estimates of \code{g(A=1|B)}.
-  Should be the same length as \code{Y} if \code{g.method}
-  is \code{"user"}. Note: this is the estimate for
-  \code{g(A=1|B)} even if \code{a=0} (e.g. for the NDE or
-  for the ATN).}
+  \item{g.Deltaform}{optional regression formula of the
+  form \code{Delta~A+B}, if specified this overrides the
+  call to \code{SuperLearner}}
 
-  \item{gDelta.method}{method to estimate
-  \code{P(Delta=1|A, B)}. Should be \code{"glm"} for glm,
-  \code{"SL"} for SuperLearner, or \code{"user"} for user
-  specified estimates of \code{g(A=1|B)}. If SuperLearner
-  is specified but not installed, glm is automatically
-  used.}
+  \item{g.SL.library}{optional vector of prediction
+  algorithms to use for \code{SuperLearner} estimation of
+  \code{g1W} or \code{pDelta1}}
 
-  \item{gDelta.formula}{the formula for glm if glm is used
-  to estimate \code{P(Delta=1|A, B)}. The response variable
-  should be called \code{Delta} and the predictors should
-  include \code{A} and variables in \code{B}.  If missing,
-  defaults to $Delta~.$ (main terms including \code{A} and
-  all variables in \code{B}).}
+  \item{family}{family specification for working regression
+  models, generally 'gaussian' for continuous outcomes
+  (default), 'binomial' for binary outcomes}
 
-  \item{gDelta.SL.library}{SuperLearner library for
-  estimating \code{P(Delta=1|A,B)} if SuperLearner is
-  used.}
+  \item{fluctuation}{'logistic' (default), or 'linear'}
 
-  \item{gDelta.1}{User specified estimates of
-  \code{P(Delta=1|A,B)}.  Should be the same length as
-  \code{Y} if \code{gDelta.method} is \code{"user"}.}
+  \item{alpha}{used to keep predicted initial values
+  bounded away from (0,1) for logistic fluctuation}
 
-  \item{family}{\code{gaussian} for a continuous outcome
-  \code{Y}, \code{binomial} for a biniomial outcome}
+  \item{id}{optional subject identifier}
 
-  \item{tol}{convergence criterion, set to something small}
+  \item{target}{\code{TRUE} (default) to preform bias
+  reduction (targeting) step. \code{FALSE} to return simple
+  G computation based substitution estimate}
 
-  \item{maxiter}{maximum number of targetting steps. 100 is
-  good. If it takes more than that it's probably not going
-  to converge.}
+  \item{tol}{convergence criterion, defaults to square root
+  of machine epsilon}
 
-  \item{target}{TRUE to preform bias reduction (targeting)
-  step. FALSE to return simple G computation based
-  substitution estimate}
+  \item{maxiter}{maximum number of iterations in the
+  targeting step. Default is 100.}
 
-  \item{verbose}{TRUE for details for each iteration}
-
-  \item{Qbound}{a numeric vector containing minimum and
-  maximum bounds for Q. Should be between 0 and 1 for now.
-  Set to something close to 0 and 1.}
-
-  \item{gbound}{a numeric vector containing minimum and
-  maximum bounds for g. Should be between 0 and 1. Set to
-  something close to 0 and 1.}
-
-  \item{...}{aditional parameters to be passed to (both)
-  perLearner calls}
+  \item{verbose}{status messages printed if set to
+  \code{TRUE} (default=\code{FALSE})}
 }
 \value{
-  An object of class \code{cte} <details on returned
-  object>
+  An object of class \code{cte} which is a list with the
+  following components: \describe{
+  \item{\code{psi}}{Parameter estimate}
+  \item{\code{var.psi}}{Influence curve based estimate of
+  the variance of \code{psi}} \item{\code{CI}}{95\%
+  confidence interval for \code{psi}}
+  \item{\code{pvalue}}{p-value from a two-sided test of
+  \code{H0: psi_0=0}} \item{\code{IC}}{A vector with the
+  value of the estimated influence curve for each
+  observation} \item{\code{estimand}}{Character string
+  describing the estimand, depends on the value of
+  \code{a}} \item{\code{Qinit}}{Initial estimate of Q from
+  the \code{estimateQ} function} \item{\code{Qstar}}{Matrix
+  of final estimates of Q after targeting}
+  \item{\code{ginit}}{Initital estimate of g from the
+  \code{estimateg} function} \item{\code{g1Wstar}}{Vector
+  of final estiates of g after targeting}
+  \item{\code{g.Delta}}{Estimate of P(Delta=1|A,W) from the
+  \code{estimateg} function} } If convergence fails, all
+  items are either \code{NA} or \code{NULL}. If
+  \code{target==FALSE}, some items are \code{NA} or
+  \code{NULL}.
 }
 \description{
-  Estimates the ``conditional treatment effect''
-  E(E(Y|A=1,W)-E(Y|A=0,W)|A=a) using Targetted Maximum
-  Likelihood.
+  Estimates the statistical parameter
+  \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]} using Targetted
+  Maximum Likelihood.
 }
 \details{
-  <details>
+  If \code{target} is \code{FALSE}, the targetting step is
+  not done, and a G-computation type estimate based only on
+  the inital estimate of Q is returned.  In this case, the
+  influence curve, variance estimate, confidence interval
+  and p-value are not calculated.
+
+  Q.SL.library defaults to ('SL.glm', 'SL.step',
+  'SL.glm.interaction') g.SL.library Defaults to ('SL.glm',
+  'SL.step', 'SL.glm.interaction') This choice is simply
+  because these algorithms are included in the base R
+  installation. See SuperLearner help files for further
+  information.
 }
 \author{
   Sam Lendle \email{lendle@stat.berkeley.edu}
+}
+\seealso{
+  \code{\link{tmle.att}}, \code{\link{tmle.ndeu}}
 }
 

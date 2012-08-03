@@ -16,6 +16,6 @@
   Prints results from tmle.cte.
 }
 \author{
-  Sam Lendle
+  Sam Lendle \email{lendle@stat.berkeley.edu}
 }
 
