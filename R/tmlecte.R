@@ -17,7 +17,7 @@ print.cte <- function(x, ...) {
 
 
 
-##' Estimates the statistical parameter \emph{E(E(Y|A=1,W)-E(Y|A=0,W)|A=a)} using Targetted Maximum Likelihood.
+##' Estimates the statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]} using Targetted Maximum Likelihood.
 ##'
 ##' If \code{target} is \code{FALSE}, the targetting step is not done, and a G-computation type estimate based only on the inital estimate of Q is returned.  In this case, the influence curve, variance estimate, confidence interval and p-value are not calculated.
 ##' 
@@ -53,7 +53,7 @@ print.cte <- function(x, ...) {
 ##' @param tol convergence criterion, defaults to square root of machine epsilon
 ##' @param maxiter maximum number of iterations in the targeting step. Default is 100.
 ##' @param verbose status messages printed if set to \code{TRUE} (default=\code{FALSE})
-##' @return An object of class \code{tmle.cte} which is a list with the following components:
+##' @return An object of class \code{cte} which is a list with the following components:
 ##' \describe{
 ##' \item{\code{psi}}{Parameter estimate}
 ##' \item{\code{var.psi}}{Influence curve based estimate of the variance of \code{psi}}

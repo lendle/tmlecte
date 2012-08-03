@@ -7,7 +7,7 @@
 ##' @param W vector, matrix, or dataframe containing baseline covariates to control for.
 ##' @param param The parameter being estimated, "ATT" (default) or "ATU".
 ##' @param ... other arguments passed to \code{\link{tmle.cte}}
-##' @return An object of class \code{tmle.cte} with \code{$estimand} set to \code{param}.
+##' @return An object of class \code{cte} with \code{$estimand} set to \code{param}.
 ##' @seealso \code{\link{tmle.cte}}
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 tmle.att <- function(Y, A, W, param=c("ATT", "ATU"), ...) {
