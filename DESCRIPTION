@@ -24,6 +24,7 @@ Collate:
     'regress.R'
     'tmlecte-package.R'
     'tmlecte.R'
+    'tmlecte2.R'
     'tmlende.R'
     'tmleatt.R'
     'tmle.R'
