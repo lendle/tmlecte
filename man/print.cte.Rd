@@ -1,6 +1,6 @@
 \name{print.cte}
 \alias{print.cte}
-\title{\code{print.cte} function}
+\title{Prints object of class \code{cte}}
 \usage{
   \method{print}{cte} (x, ...)
 }

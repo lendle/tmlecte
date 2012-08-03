@@ -1,7 +1,7 @@
 ##' Prints results from tmle.cte.
 ##'
 ##' 
-##' @title \code{print.cte} function
+##' @title Prints object of class \code{cte}
 ##' @param x an ojbect of class \code{cte}
 ##' @param ... ignored
 ##' @return Nothing
@@ -24,7 +24,7 @@ print.cte <- function(x, ...) {
 ##' Q.SL.library defaults to ('SL.glm', 'SL.step', 'SL.glm.interaction')
 ##' g.SL.library Defaults to ('SL.glm', 'SL.step', 'SL.glm.interaction')
 ##' This choice is simply because these algorithms are included in the base R installation. See SuperLearner help files for further information.
-##' @title tmle.cte
+##' @title TMLE for statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]}
 ##' @param Y continuous or binary outcome variable
 ##' @param A binary treatment indicator, \code{1} - treatment, \code{0} - control
 ##' @param B vector, matrix, or dataframe containing covariates to control for. Baseline covariates for the ATT,

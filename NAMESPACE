@@ -1,5 +1,5 @@
-S3method(predict,regress)
-S3method(print,cte)
 export(regress)
 export(tmle.cte)
 export(tmle.ndeu)
+S3method(predict,regress)
+S3method(print,cte)

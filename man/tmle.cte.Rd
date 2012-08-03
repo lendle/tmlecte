@@ -1,16 +1,16 @@
 \name{tmle.cte}
 \alias{tmle.cte}
-\title{tmle.cte}
+\title{TMLE for statistical parameter \emph{E[E(Y|A=1,W)-E(Y|A=0,W)|A=a]}}
 \usage{
   tmle.cte(Y, A, B, a = 0, Delta = NULL, Q = NULL,
     Qform = NULL,
-    Q.SL.library = c("SL.glm",<c2><a0>"SL.step",<c2><a0>"SL.glm.interaction"),
+    Q.SL.library = c("SL.glm", "SL.step", "SL.glm.interaction"),
     Qbounds = NULL, g1W = NULL, gform = NULL,
     gbound = 0.001, pDelta1 = NULL, g.Deltaform,
-    g.SL.library = c("SL.glm",<c2><a0>"SL.step",<c2><a0>"SL.glm.interaction"),
+    g.SL.library = c("SL.glm", "SL.step", "SL.glm.interaction"),
     family = gaussian(),
-    fluctuation = c("logistic",<c2><a0>"linear"),
-    alpha = 0.995, id = 1:length(Y), target = TRUE,
+    fluctuation = c("logistic", "linear"), alpha = 0.995,
+    id = 1:length(Y), target = TRUE,
     tol = sqrt(.Machine$double.eps), maxiter = 100,
     verbose = FALSE)
 }

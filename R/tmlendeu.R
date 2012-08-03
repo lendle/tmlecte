@@ -1,7 +1,7 @@
-##' <description>
+##' Estimates the Natural Direct Effect among the Untreated (NDEU), \emph{E[Y(1,Z(0))-Y(0,Z(0))|A=0]}, using targeted maximum likelihood.
 ##'
-##' <details>
-##' @title <title>
+##' If baseline covariates are independent of treatment, then this method also estimates the Natural Direct Effect (NDE). Specifying \code{RCT=TRUE} changes the label of the statistical parameter in the output to reflect this. 
+##' @title TMLE for the NDEU
 ##' @param Y continuous or binary outcome variable
 ##' @param A binary treatment indicator, \code{1} - treatment, \code{0} - control
 ##' @param WZ vector, matrix, or dataframe containing baseline covariate(s), if applicable, and mediator(s).
