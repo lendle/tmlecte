@@ -272,7 +272,9 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
     res <- list(psi=NA,
                 var.psi=NA,
                 CI=NA,
-                pvalue=NA
+                pvalue=NA,
+                Qstar=NA,
+                gstar=NA
                 )
   }
 
@@ -291,7 +293,8 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
     CI <- psi + c(-1.96, 1.96)*sqrt(var.psi)
     pvalue <- 2*(1-pnorm(abs(psi/sqrt(var.psi))))
     estimand <- paste("E(E(Y|A=1,B)-E(Y|A=0,B)|A=", a, ")", sep="")
-    res <- list(psi=psi, var.psi=var.psi, CI=CI, pvalue=pvalue, IC=IC, estimand=estimand)
+    res <- list(psi=psi, var.psi=var.psi, CI=CI, pvalue=pvalue, IC=IC, estimand=estimand,
+                Qstar=cbind("Q.A0"=Q.A0, "Q.A1"=Q.A1), gstar=g.A1)
   }
   class(res) <- c("cte")
   res
