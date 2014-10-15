@@ -1,19 +1,11 @@
-#---------- function .setColnames ---------------
-# assign names to every unnamed column of x
-# arguments
-# 	x.colnames - current column names
-#	x.ncols - current number of columns
-# 	firstChar - prefix for internally assigned name
-# return the names
-#-----------------------------------------
-##' <description>
+##' .setColnames function
 ##'
-##' <details>
-##' @title <title>
-##' @param x.colnames <description>
-##' @param x.ncols <description>
-##' @param firstChar <description>
-##' @return <return>
+##' assign names to every unnamed column of x
+##' @title .setColnames function
+##' @param x.colnames current column names
+##' @param x.ncols current number of columns
+##' @param firstChar prefix for internally assigned name
+##' @return column names
 ##' @author Susan Gruber
 ##' @name setColnames
 ##' @aliases .setColnames
@@ -33,8 +25,9 @@
 	return(x.colnames)
 }
 
+##' .bound funciton 
+##' 
 ##' set outliers to min/max allowable values
-##'
 ##' @title .bound function
 ##' @param x object of numerical data, usually a matrix or vector
 ##' @param bounds object of numeric data where the min is the minimum

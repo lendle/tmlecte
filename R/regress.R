@@ -1,14 +1,14 @@
-##' <description>
+##' regress function
 ##'
-##' <details>
-##' @title <title>
+##' 
+##' @title regress function
 ##' @param resp dependent variable for regression
 ##' @param X predictor variables for regression
 ##' @param family error distribution. Can be \code{gaussian} or \code{binomial}
 ##' @param method \code{"glm"} for glm or \code{"SL"} for SuperLearner
 ##' @param formula regression formula for glm. Defaults to \code{resp~.} if not specified.  The dependent variable on the lhs of the ~ does not matter, and is automatically changed to \code{resp}.
 ##' @param ... additional options to be passed to SuperLearner
-##' @return <return>
+##' @return returns an object of type \code{regress}
 ##' @author Sam Lendle
 ##' @export
 regress <- function(resp, X, family=binomial(), method="glm", formula=resp ~ ., ...) {
@@ -41,10 +41,10 @@ regress <- function(resp, X, family=binomial(), method="glm", formula=resp ~ ., 
   return(res)
 }
 
-##' <description>
+##' predict.regress function
 ##'
-##' <details>
-##' @title <title>
+##' 
+##' @title predict.regress function
 ##' @param object an object of class \code{regress}
 ##' @param newdata optional new data for prediction in the same format
 ##' as \code{X} used in the original \code{regress} call

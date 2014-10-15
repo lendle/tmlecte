@@ -15,9 +15,9 @@ print.cte <- function(x, ...) {
       "\nP-value for H0: psi=0 vs. H1: psi!=0:", format.pval(x$pvalue, eps=0.001), "\n", sep="")
 }
 
-##' Estimates the ``conditional treatment effect'' E(E(Y|A=1,W)-E(Y|A=0,W)|A=a) using Targetted Maximum Likelihood.
+##' Estimates the ``conditional treatment effect'' E(E(Y|A=1,B)-E(Y|A=0,B)|A=a) using Targetted Maximum Likelihood.
 ##'
-##' <details>
+##' 
 ##' @title tmle.cte function
 ##' @param A binary treatment indicator where 1 is treated and 0 is
 ##' not treated 
@@ -87,7 +87,6 @@ print.cte <- function(x, ...) {
 ##' @param ... aditional parameters to be passed to (both)
 ##'perLearner calls 
 ##' @return An object of class \code{cte}
-##' <details on returned object>
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
 ##' @export
 tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {

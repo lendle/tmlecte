@@ -1,11 +1,13 @@
-##' <description>
+##' TMLE for the average treatment effect among the treated (ATT)
 ##'
-##' <details>
-##' @title <title>
+##' This function estimates E[E(Y|A=1, W) - E(Y|A=0, W) | A=1].
+##' Under particular causal assumptions, this is equal to the ATT.
+##' This is a wrapper function to \code{tmle.cte}.
+##' @title tmle.att function
 ##' @param A treatment
 ##' @param W baseline covariates
 ##' @param Y outcome
-##' @param ... other arguments to be passed to tmle.cte
+##' @param ... other arguments to be passed to \code{tmle.cte}
 ##' @return an object of class "cte"
 ##' @author Sam Lendle
 ##' @export
