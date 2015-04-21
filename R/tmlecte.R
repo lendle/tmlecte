@@ -181,7 +181,7 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
     }
     gDelta.1 <- .bound(gDelta.1, c(1, min(gbound)))
   } else {
-    if (method=="user" && !is.null(gDelta.1) && sum(!is.na(gDelta.1))>0) {
+    if (gDelta.method=="user" && !is.null(gDelta.1) && sum(!is.na(gDelta.1))>0) {
       # If there are no missing values for outcome, but gDelta.1 is specified by the user, 
       # Do nothing. Leave as is. 
     } else {
