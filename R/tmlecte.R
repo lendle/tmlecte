@@ -68,7 +68,10 @@ print.cte <- function(x, ...) {
 ##' @param gDelta.SL.library SuperLearner library for estimating
 ##' \code{P(Delta=1|A,B)} if SuperLearner is used.
 ##' @param gDelta.1 User specified estimates of \code{P(Delta=1|A,B)}.  Should be the same length as
-##' \code{Y} if \code{gDelta.method} is \code{"user"}.
+##' \code{Y} if \code{gDelta.method} is \code{"user"}. This parameter can also be used to specify 
+##' matching or sampling weights by setting gDelta.1 = 1/weights. If this option is specified, 
+##' the user must also set gDelta.method = "user" and Delta = 1 for all observations (See Rudolf
+##' et al below).
 ##' @param family \code{gaussian} for a continuous outcome \code{Y},
 ##' \code{binomial} for a biniomial outcome
 ##' @param tol convergence criterion, set to something small
@@ -88,6 +91,9 @@ print.cte <- function(x, ...) {
 ##'perLearner calls 
 ##' @return An object of class \code{cte}
 ##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
+##' @references Rudolf KE, Diaz I, Rosenblum M, Stuart EA (2014) Estimating population treatment
+##' effects from a survey subsample. American Journal of Epidemiology DOI: 10.1093/aje/kwu197.
+##' \url{http://aje.oxfordjournals.org/content/early/2014/09/04/aje.kwu197.full.pdf+html}
 ##' @export
 tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
@@ -181,7 +187,12 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
     }
     gDelta.1 <- .bound(gDelta.1, c(1, min(gbound)))
   } else {
-   gDelta.1 <- rep(1, length(Y))
+    if (gDelta.method=="user" && !is.null(gDelta.1) && sum(!is.na(gDelta.1))>0) {
+      # If there are no missing values for outcome, but gDelta.1 is specified by the user, 
+      # Do nothing. Leave as is. 
+    } else {
+      gDelta.1 <- rep(1, length(Y))
+    }
   }
 
   fail=FALSE
