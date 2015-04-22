@@ -21,6 +21,6 @@
 ##' @name tmlecte-package
 ##' @aliases tmlecte
 ##' @title Estimates the NDE and ATT with TMLE
-##' @author Sam Lendle \email{sam.lenlde@@gmail.com}
+##' @author Sam Lendle \email{sam.lendle@@gmail.com}
 ##' @keywords package
 {}
