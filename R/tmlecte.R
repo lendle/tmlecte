@@ -198,57 +198,58 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
     iter=0
     done=FALSE
     prev.crit <- -1
+    
+    Q.A1 <- .bound(Q.A1, Qbound)
+    Q.A0 <- .bound(Q.A0, Qbound)
 
     while(!done) {
       iter=iter+1
 
-      #bound Q away from 0 and 1 so logit(Q) can be calculated
-      Q.A1 <- .bound(Q.A1, Qbound)
-      Q.A0 <- .bound(Q.A0, Qbound)
+      if (iter > 1) {
+        #only fluctuate g after Q has been fluctuated.
+        
+        H2 <- (Q.A1-Q.A0 - psi)
+        
+        g.up <- glm(Aa~-1+H2, offset=qlogis(g.Aa), family=binomial)
+        g.eps <- coef(g.up)
+        if (is.na(g.eps)) g.eps <- 0
+        
+        #Fluctuate g
+        g.Aa <- plogis(qlogis(g.Aa)+g.eps*H2)
+        
+        #bound g away from 0 and 1 so logit(g) can be calculated, and clever covars
+        g.Aa <- .bound(g.Aa, gbound)
+        if (a==1) {
+          g.A1 <- g.Aa
+          g.A0 <- 1-g.A1
+        } else {
+          g.A0 <- g.Aa
+          g.A1 <- 1-g.A0
+        }
+      } else {
+        g.eps <- 99
+      }
 
-      #Calculate target parameter at current step
-      psi <- mean(Q.A1[A==a] - Q.A0[A==a])
- 
       #Calculate expected outcome under treatment recieved
       Q.AA <- A*Q.A1 + (1-A)*Q.A0
-
-      #bound g away from 0 and 1 so logit(g) can be calculated, and clever covars
-      g.Aa <- .bound(g.Aa, gbound)
-      if (a==1) {
-        g.A1 <- g.Aa
-        g.A0 <- 1-g.A1
-      } else {
-        g.A0 <- g.Aa
-        g.A1 <- 1-g.A0
-      }
-      #g.A1 <- a*g.Aa + (1-a)*(1-g.Aa)
-      #g.A0 <- 1-g.A1
-      
-      
       #Calculate covariates for fluctuation
-      #H1 <- (A*g.A0/(1-g.A0)-(1-A))
-      #H1 <- A*g.Aa/g.A1 - (1-A)*g.Aa/g.A0
-      
-      #H1.A1 <- Delta/g.D1
-      #H1.A0 <- (Delta/g.D1)*(-g.A1/(1-g.A1))
       H1.A1 <- (1/gDelta.1)*(g.Aa/g.A1)
       H1.A0 <- (1/gDelta.1)*(-g.Aa/g.A0)
       H1 <- A*H1.A1 + (1-A)*H1.A0
-      H2 <- (Q.A1-Q.A0 - psi)
-
-      #Estimate epsilon for logistic fluctuation of Q and g
-      Q.up <- suppressWarnings(glm(Y~-1+H1, offset=qlogis(Q.AA), family=binomial))
-      #Q.up <- glm(Y~-1+H1, dat, offset=Q.AA, family=gaussian, subset=(Delta==1))
-      g.up <- glm(Aa~-1+H2, offset=qlogis(g.Aa), family=binomial)
-      eps <- c(coef(Q.up), coef(g.up))
-      if (is.na(eps[2])) {eps[2] <- 0}
-
-      #Fluctuate predicted outcome and treatment, Q and g
-      Q.A1 <- plogis(qlogis(Q.A1)+eps[1]*H1.A1)
-      Q.A0 <- plogis(qlogis(Q.A0)+eps[1]*H1.A0)
-      g.Aa <- plogis(qlogis(g.Aa)+eps[2]*H2)
       
-      crit <- max(abs(na.omit(eps)))
+      Q.up <- suppressWarnings(glm(Y~-1+H1, offset=qlogis(Q.AA), family=binomial))
+      Q.eps <- coef(Q.up)
+      Q.A1 <- plogis(qlogis(Q.A1)+Q.eps[1]*H1.A1)
+      Q.A0 <- plogis(qlogis(Q.A0)+Q.eps[1]*H1.A0)
+      
+      #bound Q away from 0 and 1 so logit(Q) can be calculated
+      Q.A1 <- .bound(Q.A1, Qbound)
+      Q.A0 <- .bound(Q.A0, Qbound)
+      
+      #Calculate target parameter at current step
+      psi <- mean(Q.A1[A==a] - Q.A0[A==a])          
+      
+      crit <- max(abs(c(Q.eps, g.eps)))
       if (crit <= tol || iter>=maxiter) {
         done=TRUE
       }
@@ -263,7 +264,7 @@ tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q
       }
       prev.crit <- crit
       
-      if (verbose) cat("iter:", iter, "eps:", eps, "crit:", crit, "psi:", psi, "\n")
+      if (verbose) cat("iter:", iter, "eps:", Q.eps, g.eps, "crit:", crit, "psi:", psi, "\n")
     }
   }
 
