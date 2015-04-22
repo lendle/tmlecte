@@ -3,8 +3,8 @@
 ##' \tabular{ll}{
 ##' Package: \tab tmlecte\cr
 ##' Type: \tab Package\cr
-##' Version: \tab 0.3.0\cr
-##' Date: \tab 2011-06-29\cr
+##' Version: \tab 0.3.1\cr
+##' Date: \tab 2015-04-21\cr
 ##' License: \tab GPL (>= 2)\cr
 ##' LazyLoad: \tab yes\cr
 ##' }
@@ -21,6 +21,6 @@
 ##' @name tmlecte-package
 ##' @aliases tmlecte
 ##' @title Estimates the NDE and ATT with TMLE
-##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
+##' @author Sam Lendle \email{sam.lenlde@@gmail.com}
 ##' @keywords package
 {}

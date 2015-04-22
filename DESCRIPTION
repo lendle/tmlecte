@@ -4,7 +4,7 @@ License: GPL-3
 Title: Estimates the NDE and ATT with TMLE
 Type: Package
 LazyLoad: yes
-Author: Sam Lendle <lendle@stat.berkeley.edu>
+Author: Sam Lendle <sam.lendle@gmail.com>
 Description: Estimates the Average Treatment effect among the Treated
     (ATT), or among the not treated. The latter is the same statistical
     parameter as the Natural Direct Effect (NDE) when there is no
@@ -17,5 +17,5 @@ Description: Estimates the Average Treatment effect among the Treated
     is a working package.  The methods in this package will likely be
     made available in the tmle package on CRAN in the future.
 Enhances: SuperLearner
-Version: 0.3.0
-Date: 2014-10-15
+Version: 0.3.1
+Date: 2015-04-21

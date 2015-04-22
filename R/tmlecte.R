@@ -87,7 +87,7 @@ print.cte <- function(x, ...) {
 ##' @param ... aditional parameters to be passed to (both)
 ##'perLearner calls 
 ##' @return An object of class \code{cte}
-##' @author Sam Lendle \email{lendle@@stat.berkeley.edu}
+##' @author Sam Lendle \email{sam.lendle@@gmail.com}
 ##' @export
 tmle.cte <- function(A, B, Y, a=0, Delta=NULL, Q.method="glm", Q.formula=NULL, Q.SL.library=NULL, Q.A1=NULL, Q.A0=NULL, g.method="glm", g.formula=NULL, g.SL.library=c("SL.glm", "SL.step", "SL.knn"), g.A1=NULL, gDelta.method="glm", gDelta.formula=NULL, gDelta.SL.library=c("SL.glm", "SL.step", "SL.knn"), gDelta.1=NULL, family=gaussian(), tol=1e-10, maxiter=100, target=TRUE, verbose=FALSE, Qbound=c(1e-10, 1-1e-10), gbound=c(1e-10, 1-1e-10), ...) {
 
